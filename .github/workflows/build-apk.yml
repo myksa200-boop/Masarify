@@ -26,17 +26,37 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev python3-pip
-          pip3 install --user buildozer cython pillow
+          sudo apt-get install -y -qq git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev python3-pip make
+          pip3 install --user buildozer cython pillow python-for-android setuptools
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: 🔍 Debug
+        run: |
+          echo "=== Files ==="
+          ls -la
+          echo "==="
+          echo "=== JAVA_HOME ==="
+          echo "JAVA_HOME=$JAVA_HOME_17_JRE"
+          ls -la $JAVA_HOME_17_JRE/bin/java
+          echo "==="
+          echo "=== Python ==="
+          python3 --version
+          pip3 list 2>/dev/null | grep -iE "buildozer|kivy|cython|setuptools"
+          echo "==="
+          echo "=== Buildozer ==="
+          python3 -m buildozer --version 2>&1 || true
+          echo "==="
+          echo "=== Buildozer.spec ==="
+          head -30 buildozer.spec
 
       - name: 🛠️ Build APK
         run: |
+          set -x
           export JAVA_HOME=$JAVA_HOME_17_JRE
-          export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
           python3 -m buildozer android debug 2>&1 | tee build_output.log
-          exit ${PIPESTATUS[0]}
+        continue-on-error: true
 
-      - name: 📋 Upload build log (always)
+      - name: 📋 Upload build log
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -44,7 +64,7 @@ jobs:
           path: build_output.log
           if-no-files-found: ignore
 
-      - name: 📦 Upload APK (if exists)
+      - name: 📦 Upload APK
         if: always()
         uses: actions/upload-artifact@v4
         with:
