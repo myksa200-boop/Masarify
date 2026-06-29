@@ -32,18 +32,28 @@ jobs:
       - name: 🛠️ Build APK
         run: |
           export JAVA_HOME=$JAVA_HOME_17_JRE
-          export PATH=$JAVA_HOME/bin:$PATH
-          python3 -m buildozer android debug
+          export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
+          python3 -m buildozer android debug 2>&1 | tee build_output.log
+          exit ${PIPESTATUS[0]}
 
-      - name: 📦 Upload APK
+      - name: 📋 Upload build log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build_output.log
+          if-no-files-found: ignore
+
+      - name: 📦 Upload APK (if exists)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Masarify-APK
           path: bin/*.apk
-          if-no-files-found: error
+          if-no-files-found: ignore
 
       - name: 📤 Release
-        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
         with:
           files: bin/*.apk
