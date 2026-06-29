@@ -9,79 +9,48 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-
-      - name: 🐍 Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: ☕ Java 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 📦 Install dependencies
+      - name: Install deps
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev python3-pip make
-          pip3 install --user buildozer cython pillow python-for-android setuptools
+          pip3 install --user buildozer cython pillow python-for-android setuptools wheel
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: 🔍 Debug
+      - name: Build APK
+        id: build
         run: |
-          echo "=== Files ==="
-          ls -la
-          echo "==="
-          echo "=== JAVA_HOME ==="
-          echo "JAVA_HOME=$JAVA_HOME_17_JRE"
-          ls -la $JAVA_HOME_17_JRE/bin/java
-          echo "==="
-          echo "=== Python ==="
-          python3 --version
-          pip3 list 2>/dev/null | grep -iE "buildozer|kivy|cython|setuptools"
-          echo "==="
-          echo "=== Buildozer ==="
-          python3 -m buildozer --version 2>&1 || true
-          echo "==="
-          echo "=== Buildozer.spec ==="
-          head -30 buildozer.spec
-
-      - name: 🛠️ Build APK
-        run: |
-          set -x
           export JAVA_HOME=$JAVA_HOME_17_JRE
-          python3 -m buildozer android debug 2>&1 | tee build_output.log
-          echo "BUILD_EXIT=${PIPESTATUS[0]}"
-        continue-on-error: true
+          export PATH=$JAVA_HOME/bin:$PATH
+          python3 -m buildozer android debug 2>&1 | tee build_output.log || true
+          echo "---END BUILD---"
 
-      - name: 📋 Print build log
+      - name: Show log
         if: always()
         run: |
-          echo "=== BUILD OUTPUT LOG ==="
-          cat build_output.log 2>/dev/null || echo "No log file"
-          echo "=== END LOG ==="
+          wc -l build_output.log
+          tail -30 build_output.log
+          ls -la bin/ 2>/dev/null || echo "No bin dir"
 
-      - name: 📋 Upload build log
+      - name: Upload log
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-log
           path: build_output.log
-          if-no-files-found: ignore
 
-      - name: 📦 Upload APK
+      - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Masarify-APK
           path: bin/*.apk
           if-no-files-found: ignore
-
-      - name: 📤 Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: bin/*.apk
