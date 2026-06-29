@@ -36,9 +36,15 @@ jobs:
       - name: Show log
         if: always()
         run: |
-          wc -l build_output.log
-          tail -30 build_output.log
+          echo "=== BUILD LOG (FULL) ==="
+          cat build_output.log 2>/dev/null || echo "NO LOG FILE"
+          echo "=== END LOG ==="
+          echo "=== BIN DIR ==="
           ls -la bin/ 2>/dev/null || echo "No bin dir"
+          echo "=== .buildozer ==="
+          ls -la .buildozer/ 2>/dev/null | head -5 || echo "No .buildozer"
+          echo "=== JAVA ==="
+          java -version 2>&1
 
       - name: Upload log
         if: always()
