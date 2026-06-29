@@ -7,25 +7,43 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: '3.11'}
+        with:
+          python-version: '3.11'
       - uses: actions/setup-java@v4
-        with: {distribution: 'temurin', java-version: '17'}
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Install
+      - name: Install system deps
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev make ccache
+          sudo apt-get install -y -qq \
+            git zip unzip autoconf libtool pkg-config zlib1g-dev \
+            libncurses-dev cmake libffi-dev libssl-dev make ccache \
+            libgl1-mesa-dev libgles2-mesa-dev libdrm-dev libegl1-mesa-dev \
+            libx11-dev libxext-dev libxrender-dev libxcb-render0-dev libdbus-1-dev
+
+      - name: Install Python deps
+        run: |
           pip install --user buildozer cython pillow python-for-android setuptools wheel
 
-      - name: Build
+      - name: Verify tools
         run: |
           export JAVA_HOME=$JAVA_HOME_17_JRE
           export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
-          python3 -c "import buildozer; print('OK:', buildozer.__file__)"
+          echo "=== Python ===" && python3 --version
+          echo "=== Java ===" && java -version
+          echo "=== Buildozer ===" && python3 -c "import buildozer; print('OK:', buildozer.__file__)"
+          echo "=== Cython ===" && python3 -c "import Cython; print('OK:', Cython.__version__)"
+
+      - name: Build APK
+        run: |
+          export JAVA_HOME=$JAVA_HOME_17_JRE
+          export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
           python3 -m buildozer android debug 2>&1
 
       - name: Upload APK
