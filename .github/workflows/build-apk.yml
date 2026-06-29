@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,21 +20,17 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq git zip unzip autoconf libtool pkg-config zlib1g-dev \
             libncurses-dev cmake libffi-dev libssl-dev python3-pip make ccache
-          pip3 install --user buildozer cython pillow python-for-android setuptools wheel
-          echo "JAVA_HOME=$JAVA_HOME_17_JRE" >> $GITHUB_ENV
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          pip3 install --user --upgrade buildozer cython pillow python-for-android setuptools wheel
 
-      - name: Build with buildozer
+      - name: Build
         run: |
+          set -e  # Exit on error
           export JAVA_HOME=$JAVA_HOME_17_JRE
-          java -version 2>&1
-          gcc --version 2>&1 | head -1
+          export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
+          echo "=== ENV ==="
+          which java python3 buildozer
+          python3 -m buildozer --version
+          echo "=== FILES ==="
+          ls -la
+          echo "=== BUILD START ==="
           python3 -m buildozer android debug 2>&1
-        continue-on-error: true
-
-      - name: Find APK
-        if: always()
-        run: |
-          find . -name "*.apk" -type f 2>/dev/null
-          # Also look in .buildozer
-          find .buildozer -name "*.apk" -type f 2>/dev/null
