@@ -1,0 +1,424 @@
+<MDRectangleFlatButton>:
+    font_name: "Arabic"
+<MDFillRoundFlatButton>:
+    font_name: "Arabic"
+<MDLabel>:
+    font_name: "Arabic"
+<MDTextField>:
+    font_name: "Arabic"
+<MDTopAppBar>:
+    font_name: "Arabic"
+<ThreeLineListItem>:
+    font_name: "Arabic"
+
+# ─── Custom Widgets ─────────────────────────────────────────────────────────
+
+<CategoryCard>:
+    size_hint_y: None
+    height: dp(170)
+    width: dp(180)
+    md_bg_color: [0.25, 0.3, 0.42, 1]
+    radius: [dp(16),]
+    elevation: 4
+    padding: dp(12)
+    spacing: dp(4)
+    orientation: "vertical"
+
+    BoxLayout:
+        size_hint_y: 0.25
+        spacing: dp(8)
+        MDLabel:
+            text: root.icon
+            font_size: sp(24)
+            size_hint_x: 0.3
+        MDLabel:
+            text: root.title
+            font_size: sp(14)
+            bold: True
+            halign: "left"
+            theme_text_color: "Custom"
+            text_color: [1,1,1,1]
+
+    MDLabel:
+        text: f"{root.spent:,.0f} / {root.budget:,.0f} ريال"
+        font_size: sp(13)
+        halign: "center"
+        theme_text_color: "Hint"
+        size_hint_y: 0.2
+
+    MDCircularProgressBar:
+        id: progress
+        size_hint: (0.8, 0.3)
+        pos_hint: {"center_x": 0.5}
+        value: root.get_percent()
+        color: root.color
+        circle_width: dp(6)
+
+    MDLabel:
+        text: root.get_status_text()
+        font_size: sp(11)
+        halign: "center"
+        theme_text_color: "Custom"
+        text_color: root.color
+        size_hint_y: 0.15
+
+
+# ─── Dashboard Screen ───────────────────────────────────────────────────────
+
+<DashboardScreen>:
+    name: "dashboard"
+    md_bg_color: [0.08, 0.1, 0.14, 1]
+
+    BoxLayout:
+        orientation: "vertical"
+        spacing: 0
+
+        MDTopAppBar:
+            title: "📊 مصاريفي"
+            left_action_items: [["menu", lambda x: None]]
+            md_bg_color: [0.12, 0.15, 0.22, 1]
+            specific_text_color: [1,1,1,1]
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(16)
+                spacing: dp(12)
+                size_hint_y: None
+                height: self.minimum_height
+
+                # Income Header Card
+                MDCard:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(90)
+                    md_bg_color: [0.15, 0.2, 0.32, 1]
+                    radius: [dp(16),]
+                    padding: dp(16)
+                    spacing: dp(4)
+
+                    MDLabel:
+                        id: income_label
+                        text: "💰 حدد دخلك الشهري"
+                        font_size: sp(18)
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: [1,1,1,1]
+
+                    MDLabel:
+                        text: "قاعدة 50/20/30: 50% احتياجات • 20% ادخار • 30% رغبات"
+                        font_size: sp(11)
+                        halign: "center"
+                        theme_text_color: "Hint"
+
+                # Three Category Cards
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(180)
+                    spacing: dp(8)
+
+                    CategoryCard:
+                        id: needs_card
+                        category: "needs"
+                        title: "احتياجات"
+                        color: [0.16, 0.5, 0.73, 1]  # Blue
+                        icon: "🏠"
+
+                    CategoryCard:
+                        id: savings_card
+                        category: "savings"
+                        title: "ادخار"
+                        color: [0.15, 0.68, 0.38, 1]  # Green
+                        icon: "💰"
+
+                    CategoryCard:
+                        id: wants_card
+                        category: "wants"
+                        title: "رغبات"
+                        color: [0.9, 0.49, 0.13, 1]  # Orange
+                        icon: "🎮"
+
+                # Summary Card
+                MDCard:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(100)
+                    md_bg_color: [0.15, 0.2, 0.32, 1]
+                    radius: [dp(16),]
+                    padding: dp(16)
+                    spacing: dp(4)
+
+                    MDLabel:
+                        id: total_spent_label
+                        text: "إجمالي المصروف: 0 ريال"
+                        font_size: sp(16)
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: [1, 0.6, 0.6, 1]
+
+                    MDLabel:
+                        id: remaining_label
+                        text: "المتبقي: 0 ريال"
+                        font_size: sp(20)
+                        bold: True
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: [0.39, 0.91, 0.56, 1]
+
+
+# ─── Add Expense Screen ─────────────────────────────────────────────────────
+
+<AddExpenseScreen>:
+    name: "add_expense"
+    md_bg_color: [0.08, 0.1, 0.14, 1]
+
+    BoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "➕ إضافة معاملة"
+            md_bg_color: [0.12, 0.15, 0.22, 1]
+            specific_text_color: [1,1,1,1]
+
+        ScrollView:
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(20)
+                spacing: dp(16)
+                size_hint_y: None
+                height: self.minimum_height
+
+                # Transaction Type Toggle
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(48)
+                    spacing: dp(12)
+
+                    MDRectangleFlatButton:
+                        id: type_btn_expense
+                        text: "🔴 مصروف"
+                        on_release: root.set_type_expense()
+                        md_bg_color: [0.2, 0.6, 0.9, 1]
+                        text_color: [1,1,1,1]
+                        line_color: [0.2, 0.6, 0.9, 1]
+
+                    MDRectangleFlatButton:
+                        id: type_btn_income
+                        text: "🟢 دخل"
+                        on_release: root.set_type_income()
+                        md_bg_color: [0.3, 0.3, 0.35, 1]
+                        text_color: [0.7, 0.7, 0.7, 1]
+                        line_color: [0.3, 0.3, 0.35, 1]
+
+                # Amount
+                MDTextField:
+                    id: amount_field
+                    hint_text: "💵 المبلغ (ريال)"
+                    input_filter: "float"
+                    mode: "fill"
+                    fill_color: [0.15, 0.18, 0.28, 1]
+                    line_color_focus: [0, 0.7, 0.63, 1]
+
+                # Category Picker
+                MDRectangleFlatButton:
+                    id: category_menu
+                    text: "اختر الفئة"
+                    size_hint_y: None
+                    height: dp(54)
+                    line_color: [0.3, 0.35, 0.45, 1]
+                    on_release: root.open_category_menu()
+
+                # Description
+                MDTextField:
+                    id: description_field
+                    hint_text: "📝 وصف (اختياري)"
+                    mode: "fill"
+                    fill_color: [0.15, 0.18, 0.28, 1]
+                    line_color_focus: [0, 0.7, 0.63, 1]
+                    multiline: True
+
+                # Save Button
+                MDFillRoundFlatButton:
+                    text: "💾 حفظ المعاملة"
+                    size_hint_y: None
+                    height: dp(54)
+                    pos_hint: {"center_x": 0.5}
+                    md_bg_color: [0, 0.7, 0.63, 1]
+                    text_color: [1,1,1,1]
+                    font_size: sp(16)
+                    on_release: root.save_transaction()
+
+
+# ─── History Screen ─────────────────────────────────────────────────────────
+
+<HistoryScreen>:
+    name: "history"
+    md_bg_color: [0.08, 0.1, 0.14, 1]
+
+    BoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "📋 سجل المعاملات"
+            md_bg_color: [0.12, 0.15, 0.22, 1]
+            specific_text_color: [1,1,1,1]
+
+        MDScrollView:
+            MDList:
+                id: history_list
+
+
+# ─── Settings Screen ────────────────────────────────────────────────────────
+
+<SettingsScreen>:
+    name: "settings"
+    md_bg_color: [0.08, 0.1, 0.14, 1]
+
+    BoxLayout:
+        orientation: "vertical"
+
+        MDTopAppBar:
+            title: "⚙️ الإعدادات"
+            md_bg_color: [0.12, 0.15, 0.22, 1]
+            specific_text_color: [1,1,1,1]
+
+        ScrollView:
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(20)
+                spacing: dp(16)
+                size_hint_y: None
+                height: self.minimum_height
+
+                # Info Card
+                MDCard:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(120)
+                    md_bg_color: [0.15, 0.2, 0.32, 1]
+                    radius: [dp(16),]
+                    padding: dp(16)
+                    spacing: dp(4)
+
+                    MDLabel:
+                        text: "📖 قاعدة 50/20/30"
+                        font_size: sp(16)
+                        bold: True
+                        theme_text_color: "Custom"
+                        text_color: [0, 0.7, 0.63, 1]
+
+                    MDLabel:
+                        text: "50% احتياجات: إيجار، فواتير، طعام، مواصلات\n20% ادخار: استثمار، صندوق طوارئ\n30% رغبات: ترفيه، سفر، تسوق"
+                        font_size: sp(13)
+                        theme_text_color: "Hint"
+
+                # Income Setup
+                MDCard:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(160)
+                    md_bg_color: [0.15, 0.2, 0.32, 1]
+                    radius: [dp(16),]
+                    padding: dp(16)
+                    spacing: dp(8)
+
+                    MDLabel:
+                        text: "💵 الدخل الشهري"
+                        font_size: sp(14)
+                        bold: True
+
+                    MDTextField:
+                        id: income_field
+                        hint_text: "أدخل الدخل الشهري (ريال)"
+                        input_filter: "float"
+                        mode: "fill"
+                        fill_color: [0.12, 0.14, 0.22, 1]
+                        line_color_focus: [0, 0.7, 0.63, 1]
+
+                    MDFillRoundFlatButton:
+                        text: "💾 حفظ الدخل"
+                        size_hint_y: None
+                        height: dp(44)
+                        md_bg_color: [0, 0.7, 0.63, 1]
+                        text_color: [1,1,1,1]
+                        on_release: root.save_income()
+
+                # Danger Zone
+                MDCard:
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: dp(120)
+                    md_bg_color: [0.3, 0.12, 0.15, 1]
+                    radius: [dp(16),]
+                    padding: dp(16)
+                    spacing: dp(8)
+
+                    MDLabel:
+                        text: "⚠️ منطقة الخطر"
+                        font_size: sp(14)
+                        bold: True
+                        theme_text_color: "Error"
+
+                    MDLabel:
+                        text: "سيتم حذف جميع معاملاتك وإعادة تعيين الدخل"
+                        font_size: sp(12)
+                        theme_text_color: "Hint"
+
+                    MDRectangleFlatButton:
+                        text: "🗑️ حذف كل البيانات"
+                        theme_text_color: "Error"
+                        line_color: [1, 0.3, 0.3, 1]
+                        on_release: root.reset_data()
+
+                # Footer
+                MDLabel:
+                    text: "تطبيق مصاريفي v1.0\nقاعدة 50/20/30 لتخطيط الميزانية"
+                    font_size: sp(11)
+                    halign: "center"
+                    theme_text_color: "Hint"
+                    size_hint_y: None
+                    height: dp(60)
+
+
+# ─── Root Layout ────────────────────────────────────────────────────────────
+
+MDScreen:
+    md_bg_color: [0.08, 0.1, 0.14, 1]
+
+    MDBottomNavigation:
+        id: bottom_nav
+        panel_color: [0.12, 0.15, 0.22, 1]
+        selected_color_background: [0, 0.7, 0.63, 0.2]
+        text_color_active: [0, 0.7, 0.63, 1]
+
+        MDBottomNavigationItem:
+            name: "dashboard"
+            text: "الرئيسية"
+            icon: "chart-pie"
+
+            DashboardScreen:
+
+        MDBottomNavigationItem:
+            name: "add_expense"
+            text: "إضافة"
+            icon: "plus-circle"
+
+            AddExpenseScreen:
+
+        MDBottomNavigationItem:
+            name: "history"
+            text: "السجل"
+            icon: "format-list-bulleted"
+
+            HistoryScreen:
+
+        MDBottomNavigationItem:
+            name: "settings"
+            text: "الإعدادات"
+            icon: "cog"
+
+            SettingsScreen:

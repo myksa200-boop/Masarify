@@ -1,0 +1,10 @@
+# Buildozer build artifacts
+.bin/
+bin/
+.buildozer/
+.distlib/
+*.pyc
+__pycache__/
+*.log
+.DS_Store
+*.spec.bak
