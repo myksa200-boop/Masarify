@@ -54,7 +54,15 @@ jobs:
           set -x
           export JAVA_HOME=$JAVA_HOME_17_JRE
           python3 -m buildozer android debug 2>&1 | tee build_output.log
+          echo "BUILD_EXIT=${PIPESTATUS[0]}"
         continue-on-error: true
+
+      - name: 📋 Print build log
+        if: always()
+        run: |
+          echo "=== BUILD OUTPUT LOG ==="
+          cat build_output.log 2>/dev/null || echo "No log file"
+          echo "=== END LOG ==="
 
       - name: 📋 Upload build log
         if: always()
