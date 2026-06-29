@@ -23,7 +23,7 @@ source.include_patterns = fonts/*.ttf
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.3.1,kivymd==1.2.0,plyer,json,datetime
+requirements = python3,kivy==2.3.1,kivymd==1.2.0,plyer
 
 # (str) Custom source folders for requirements
 # requirements.source.kivy = ../kivy
